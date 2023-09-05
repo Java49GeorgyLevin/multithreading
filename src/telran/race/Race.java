@@ -19,6 +19,7 @@ public class Race {
 			racers[i] = new Racer("Cockroach-" + j ,distance);
 		}
 		
+		
 		Arrays.stream(racers)
 		.forEach(r -> r.start());
 		
@@ -33,7 +34,8 @@ public class Race {
 		
 		return Arrays.stream(racers)
 				.min(Comparator.comparing(r -> r.getFinishTime()))
-				.orElseThrow();
+				.orElseThrow();		
+		
 	}
 	
 }
