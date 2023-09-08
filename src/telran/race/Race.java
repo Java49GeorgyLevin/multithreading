@@ -1,41 +1,31 @@
 package telran.race;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 public class Race {
-
-	private int numThreads;
 	private int distance;
-	public Race(int numThreads, int distance) {
-		this.numThreads = numThreads;
+	private int minSleep;
+	private int maxSleep;
+	private int winner = -1;
+	public Race(int distance, int minSleep, int maxSleep) {
 		this.distance = distance;
+		this.minSleep = minSleep;
+		this.maxSleep = maxSleep;
 	}
-	
-	public Racer toStart() throws InterruptedException {
-		Racer[] racers = new Racer[numThreads];
-		for(int i = 0; i < racers.length; i++) {
-			int j = i + 1;
-			racers[i] = new Racer("Cockroach-" + j ,distance);
+	public int getWinner() {
+		return winner;
+	}
+	public void setWinner(int winner) {
+		if (this.winner == -1) {
+			this.winner = winner;
 		}
-		
-		
-		Arrays.stream(racers)
-		.forEach(r -> r.start());
-		
-		Arrays.stream(racers)
-		.forEach(r -> {			
-			try {
-				r.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
-		
-		return Arrays.stream(racers)
-				.min(Comparator.comparing(r -> r.getFinishTime()))
-				.orElseThrow();		
-		
+	}
+	public int getDistance() {
+		return distance;
+	}
+	public int getMinSleep() {
+		return minSleep;
+	}
+	public int getMaxSleep() {
+		return maxSleep;
 	}
 	
 }
