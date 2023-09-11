@@ -1,4 +1,4 @@
-package telran.race;
+package telran.multithreading.games;
 
 public class Race {
 	private int distance;

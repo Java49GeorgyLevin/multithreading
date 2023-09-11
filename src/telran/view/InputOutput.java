@@ -1,115 +1,83 @@
 package telran.view;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Set;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface InputOutput {
-	public String readString(String prompt);
+	String readString(String prompt);
 
-	public void write(Object obj);
+	void writeObject(Object obj);
+	default void close() {}
 
 	default void writeLine(Object obj) {
-		write(obj + "\n");
+		String str = obj + "\n";
+		writeObject(str);
+		
 	}
 
-	default <T> T readObject(String prompt, String errorPrompt, Function<String, T> mapper) {
-		boolean running = false;
-		T res = null;
-		do {
-			running = false;
-			String resInput = readString(prompt);
+	default <R> R readObject(String prompt, String errorPrompt, Function<String, R> mapper) {
+		R result = null;
+		while (true) {
+			String str = readString(prompt);
 			try {
-				res = mapper.apply(resInput);
-
+				result = mapper.apply(str);
+				break;
 			} catch (Exception e) {
-				writeLine(errorPrompt + ": " + e.getMessage());
-				running = true;
+				String message = e.getMessage();
+				if (message == null) {
+					message = "";
+				}
+				writeLine(errorPrompt + " " + message);
 			}
+		}
+		return result;
 
-		} while (running);
-		return res;
 	}
-
-	default int readInt(String prompt, String errorPrompt) {
+	default Integer readInt(String prompt, String errorPrompt) {
 		return readObject(prompt, errorPrompt, Integer::parseInt);
 	}
-
-	default int readInt(String prompt, String errorPrompt, int min, int max) {
-		return readObject(String.format("%s[%d - %d] ", prompt, min, max), errorPrompt,
-				string -> {
-
-			int res = Integer.parseInt(string);
-			if (res < min) {
-				throw new IllegalArgumentException("must be not less than " + min);
+	default Integer readInt(String prompt, String errorPrompt, int min, int max) {
+		return readObject(prompt, errorPrompt, s -> {
+			int num = Integer.parseInt(s);
+			if (num < min) {
+				throw new RuntimeException("less than " + min);
 			}
-			if (res > max) {
-				throw new IllegalArgumentException("must be not greater than " + max);
+			if (num > max) {
+				throw new RuntimeException("greater than " + max);
 			}
-			return res;
-
+			return num;
+			
 		});
 	}
-
 	default long readLong(String prompt, String errorPrompt) {
-		
-		return readObject(prompt, errorPrompt, Long::parseLong);
+		return readObject(prompt, errorPrompt,Long::parseLong);
 	}
-
-	default long readLong(String prompt, String errorPrompt, long min, long max) {
-		return readObject(String.format("%s[%d - %d] ", prompt, min, max), errorPrompt,
-				string -> {
-
-			long res = Long.parseLong(string);
-			if (res < min) {
-				throw new IllegalArgumentException("must be not less than " + min);
+	default double readDouble(String prompt, String errorPrompt) {
+		return readObject(prompt, errorPrompt,Double::parseDouble);
+	}
+	default String readPredicate(String prompt, String errorPrompt, 
+			Predicate<String> predicate) {
+		return readObject(prompt, errorPrompt, s -> {
+			if (!predicate.test(s)) {
+				throw new RuntimeException();
 			}
-			if (res > max) {
-				throw new IllegalArgumentException("must be not greater than " + max);
-			}
-			return res;
-
+			return s;
 		});
 	}
-
-	default String readString(String prompt, String errorPrompt, Predicate<String> predicate) {
-		
-		return readObject(prompt, errorPrompt, string -> {
-			if(!predicate.test(string)) {
-				throw new IllegalArgumentException("");
-			}
-			return string;
-		});
+	default String readOption (String prompt, String errorPrompt, List<String> options ) {
+		return readPredicate(prompt, errorPrompt, options::contains);
 	}
-
-	default String readString(String prompt, String errorPrompt,
-			Set<String> options) {
-		
-		return readString(prompt, errorPrompt, options::contains);
-	}
-
 	default LocalDate readDate(String prompt, String errorPrompt) {
-		
 		return readObject(prompt, errorPrompt, LocalDate::parse);
 	}
-
-	default LocalDate readDate(String prompt, String errorPrompt,
-			LocalDate from, LocalDate to) {
-		
-		return readObject(prompt, errorPrompt, string -> {
-			LocalDate res = LocalDate.parse(string);
-			if(res.isBefore(from) || res.isAfter(to)) {
-				throw new IllegalArgumentException
-				(String.format("Date should be in the range from %s to %s", from, to));
-			}
-			return res;
+	default LocalDate readDate(String prompt, String errorPrompt, String format) {
+		return readObject(prompt, errorPrompt, s -> {
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
+			return LocalDate.parse(s, dtf);
 		});
 	}
 
-	default double readDouble(String prompt, String errorPrompt) {
-		
-		return readObject(prompt, errorPrompt, Double::parseDouble);
-	}
 }

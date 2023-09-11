@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 public interface Item {
 String displayName();
 void perform(InputOutput io);
-boolean isExit();
+boolean isExit() ;
 static Item of(String name, Consumer<InputOutput> action, boolean isExit) {
 	return new Item() {
 		@Override
@@ -21,12 +21,11 @@ static Item of(String name, Consumer<InputOutput> action, boolean isExit) {
 			return name;
 		}
 	};
-	
 }
 static Item of(String name, Consumer<InputOutput> action) {
 	return of(name, action, false);
 }
-static Item ofExit() {
+static Item exit() {
 	return of("Exit", io -> {}, true);
 }
 }
