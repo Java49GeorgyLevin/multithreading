@@ -1,25 +1,19 @@
 package telran.multithreading.games;
 
+import java.time.Instant;
+
 public class Runner extends Thread {
 private Race race;
 private int runnerId;
-private long runnerTime;
-private int runnerPlace;
+private Instant runnerTime;
 
-public void setRunnerTime(long runnerTime) {
+
+public void setRunnerTime(Instant runnerTime) {
 	this.runnerTime = runnerTime;
 }
 
-public long getRunnerTime() {
+public Instant getRunnerTime() {
 	return runnerTime;
-}
-
-public void setRunnerPlace(int runnerPlace) {
-	this.runnerPlace = runnerPlace;
-}
-
-public long getRunnerPlace() {
-	return runnerPlace;
 }
 
 
@@ -47,8 +41,13 @@ public void run() {
 		}
 		System.out.println(runnerId);
 	}
-	race.setWinner(runnerId);
-	race.setPlace(this);
+	synchronized (race) {
+
+		setRunnerTime(Instant.now());
+		race.getWinnerTable().add(this);
+		race.setWinner(runnerId);
+	}
+
 }
 
 

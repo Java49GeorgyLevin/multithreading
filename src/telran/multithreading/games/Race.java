@@ -1,24 +1,32 @@
 package telran.multithreading.games;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 public class Race {
-	Instant startTime = null;
-	private int place = 0;
 	private int distance;
 	private int minSleep;
 	private int maxSleep;
+	private ArrayList<Runner> winnerTable; 
+	private Instant timeStart;
+	
 	private int winner = -1;
-	public Race(int distance, int minSleep, int maxSleep) {
+	public Race(int distance, int minSleep, int maxSleep, ArrayList<Runner> winnerTable, Instant timeStart ) {
 		this.distance = distance;
 		this.minSleep = minSleep;
 		this.maxSleep = maxSleep;
-	}
-	public void setStartTime(Instant startTime) {
-		this.startTime = startTime;
+		this.winnerTable = winnerTable;
+		this.timeStart = timeStart;
 	}
 	
+	public Instant getTimeStart() {
+		return timeStart;
+	}
+
+	public ArrayList<Runner> getWinnerTable() {
+		return winnerTable;
+	}
+
 	public int getWinner() {
 		return winner;
 	}
@@ -35,13 +43,7 @@ public class Race {
 	}
 	public int getMaxSleep() {
 		return maxSleep;
-	}
-	
-	public synchronized void setPlace(Runner runner) {
-		runner.setRunnerTime(ChronoUnit.MILLIS.between(startTime, Instant.now()));
-		place++;
-		runner.setRunnerPlace(place);
-				
-	}
+	}	
+
 	
 }

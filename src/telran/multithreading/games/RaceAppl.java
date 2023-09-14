@@ -1,7 +1,8 @@
 package telran.multithreading.games;
 
 import java.time.Instant;
-import java.util.Arrays;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.stream.IntStream;
 
 import telran.view.*;
@@ -33,21 +34,28 @@ public class RaceAppl {
 		int nThreads = io.readInt("Enter number of the runners","Wrong number of the runners",
 				MIN_THREADS, MAX_THREADS);
 		int distance = io.readInt("Enter distance", "Wrong Distance",MIN_DISTANCE, MAX_DISTANCE);
-		Race race = new Race(distance, MIN_SLEEP, MAX_SLEEP);
-		race.setStartTime(Instant.now());
+		Race race = new Race(distance, MIN_SLEEP, MAX_SLEEP, new ArrayList<Runner>(), Instant.now());
 		Runner[] runners = new Runner[nThreads];
 		startRunners(runners, race);
 		joinRunners(runners);
 		displayWinner(race);
-		displayTable(runners);
+		displayTable(race);
 	}
 
-	private static void displayTable(Runner[] runners) {
+	private static void displayTable(Race race) {
+		ArrayList<Runner> winnerTable = race.getWinnerTable();
 		System.out.println("place\t racer\t number time");
-		Arrays.stream(runners).sorted((r1, r2) -> Long.compare(r1.getRunnerTime(), r2.getRunnerTime()))
-		.forEach(r -> {
-			System.out.printf("%d\t %s\t %d\n",  r.getRunnerPlace(), r.getRunnerId(), r.getRunnerTime());
-		});
+
+		IntStream.range(0, winnerTable.size())
+		.mapToObj(i -> printString(i, winnerTable.get(i), race.getTimeStart()))
+		.forEach(System.out::println);
+
+		
+	}
+	
+	private static String printString(int i, Runner runner, Instant timeStart) {
+		return String.format("%d\t %s\t %d", i + 1, runner.getRunnerId(),
+				ChronoUnit.MILLIS.between(timeStart, runner.getRunnerTime()));
 		
 	}
 
