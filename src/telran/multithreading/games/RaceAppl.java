@@ -38,30 +38,23 @@ public class RaceAppl {
 		Runner[] runners = new Runner[nThreads];
 		startRunners(runners, race);
 		joinRunners(runners);
-		displayWinner(race);
-		displayTable(race);
+		displayResultsTable(race);
 	}
 
-	private static void displayTable(Race race) {
-		ArrayList<Runner> winnerTable = race.getWinnerTable();
-		System.out.println("place\t racer\t number time");
-
-		IntStream.range(0, winnerTable.size())
-		.mapToObj(i -> printString(i, winnerTable.get(i), race.getTimeStart()))
+	private static void displayResultsTable(Race race) {
+		System.out.println("place\tracer number\ttime");
+		ArrayList<Runner> resultsTable = race.getResultsTable();
+		IntStream.range(0, resultsTable.size()).mapToObj(i ->  toPrintedString(i, race))
 		.forEach(System.out::println);
-
+		
+		
+		
 		
 	}
-	
-	private static String printString(int i, Runner runner, Instant timeStart) {
-		return String.format("%d\t %s\t %d", i + 1, runner.getRunnerId(),
-				ChronoUnit.MILLIS.between(timeStart, runner.getRunnerTime()));
-		
-	}
-
-	private static void displayWinner(Race race) {
-		System.out.println("Congratulations to runner " + race.getWinner());
-		
+	private static String toPrintedString(int index, Race race) {
+		Runner runner = race.getResultsTable().get(index);
+		return String.format("%3d\t%7d\t\t%d", index + 1, runner.getRunnerId(),
+				ChronoUnit.MILLIS.between(race.getStartTime(), runner.getFinsishTime()));
 	}
 
 	private static void joinRunners(Runner[] runners) {

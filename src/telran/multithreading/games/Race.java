@@ -7,33 +7,20 @@ public class Race {
 	private int distance;
 	private int minSleep;
 	private int maxSleep;
-	private ArrayList<Runner> winnerTable; 
-	private Instant timeStart;
-	
-	private int winner = -1;
-	public Race(int distance, int minSleep, int maxSleep, ArrayList<Runner> winnerTable, Instant timeStart ) {
+	private ArrayList<Runner> resultsTable;
+	private Instant startTime;
+	public Race(int distance, int minSleep, int maxSleep, ArrayList<Runner> resultsTable, Instant startTime) {
 		this.distance = distance;
 		this.minSleep = minSleep;
 		this.maxSleep = maxSleep;
-		this.winnerTable = winnerTable;
-		this.timeStart = timeStart;
+		this.resultsTable = resultsTable;
+		this.startTime = startTime;
 	}
-	
-	public Instant getTimeStart() {
-		return timeStart;
+	public ArrayList<Runner> getResultsTable() {
+		return resultsTable;
 	}
-
-	public ArrayList<Runner> getWinnerTable() {
-		return winnerTable;
-	}
-
-	public int getWinner() {
-		return winner;
-	}
-	public void setWinner(int winner) {
-		if (this.winner == -1) {
-			this.winner = winner;
-		}
+	public Instant getStartTime() {
+		return startTime;
 	}
 	public int getDistance() {
 		return distance;
@@ -43,7 +30,6 @@ public class Race {
 	}
 	public int getMaxSleep() {
 		return maxSleep;
-	}	
-
+	}
 	
 }
