@@ -1,7 +1,5 @@
 package telran.multithreading.games;
 
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import telran.view.*;
@@ -34,21 +32,10 @@ public class RaceAppl {
 				MIN_THREADS, MAX_THREADS);
 		int distance = io.readInt("Enter distance", "Wrong Distance",MIN_DISTANCE, MAX_DISTANCE);
 		Race race = new Race(distance, MIN_SLEEP, MAX_SLEEP);
-		race.setStartTime(Instant.now());
 		Runner[] runners = new Runner[nThreads];
 		startRunners(runners, race);
 		joinRunners(runners);
 		displayWinner(race);
-		displayTable(runners);
-	}
-
-	private static void displayTable(Runner[] runners) {
-		System.out.println("place\t racer\t number time");
-		Arrays.stream(runners).sorted((r1, r2) -> Long.compare(r1.getRunnerTime(), r2.getRunnerTime()))
-		.forEach(r -> {
-			System.out.printf("%d\t %s\t %d\n",  r.getRunnerPlace(), r.getRunnerId(), r.getRunnerTime());
-		});
-		
 	}
 
 	private static void displayWinner(Race race) {
