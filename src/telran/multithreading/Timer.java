@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Timer extends Thread {
 
-	private static final DateTimeFormatter DATE_FORMATER_DEFAULT =
+	private static final DateTimeFormatter DATE_FORMATER_DEFAUTL =
 			DateTimeFormatter.ofPattern("h:mm:ss a");
 	private static final long TIMEOUT_DEFAULT = 1000;
 	private DateTimeFormatter dtf;
@@ -17,7 +17,7 @@ public class Timer extends Thread {
 		setDaemon(true);
 	}
 	public Timer() {
-		this(DATE_FORMATER_DEFAULT, TIMEOUT_DEFAULT);
+		this(DATE_FORMATER_DEFAUTL, TIMEOUT_DEFAULT);
 	}
 	@Override
 	public void run() {
