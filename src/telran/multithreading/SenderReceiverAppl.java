@@ -14,7 +14,6 @@ public class SenderReceiverAppl {
 		Sender sender = new Sender(messageBox, N_MESSAGES);
 		sender.start();
 		startReceivers(messageBox);
-		Thread.sleep(200);
 	}
 
 	private static void startReceivers(MessageBox messageBox) throws InterruptedException {
