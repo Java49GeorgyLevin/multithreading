@@ -11,10 +11,11 @@ public class Receiver extends Thread {
 	}
 	@Override
 	public void run() {
-		while(true) {//FIXME
+		while(true) { //FIXME
 			try {
 				String message = messageBox.get();
 				System.out.printf("Thread %d has got message: %s\n", getId(), message);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

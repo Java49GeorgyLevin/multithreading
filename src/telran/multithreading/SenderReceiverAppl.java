@@ -15,16 +15,13 @@ public class SenderReceiverAppl {
 		sender.start();
 		startReceivers(messageBox);
 		Thread.sleep(200);
-
 	}
 
-	
-
-	private static void startReceivers(MessageBox messageBox) {
-		for(int i = 0; i < N_RECEIVERS; i++) {
+	private static void startReceivers(MessageBox messageBox) throws InterruptedException {
+		for (int i = 0; i < N_RECEIVERS; i++) {
 			new Receiver(messageBox).start();
 		}
-		
+
 	}
 
 }
