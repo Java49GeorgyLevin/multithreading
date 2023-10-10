@@ -13,12 +13,23 @@ public class SenderReceiverAppl {
 		MessageBox messageBox = new MessageBox();
 		Sender sender = new Sender(messageBox, N_MESSAGES);
 		sender.start();
-		startReceivers(messageBox);
+		Receiver[] receivers = new Receiver[N_RECEIVERS];
+		startReceivers(messageBox, receivers);
+		sender.join();
+		stopReceivers(receivers);		
 	}
 
-	private static void startReceivers(MessageBox messageBox) throws InterruptedException {
+	private static void stopReceivers(Receiver[] receivers) {
+		for(Receiver receiver: receivers) {
+			receiver.interrupt();
+		}
+		
+	}
+
+	private static void startReceivers(MessageBox messageBox, Receiver[] receivers) throws InterruptedException {
 		for (int i = 0; i < N_RECEIVERS; i++) {
-			new Receiver(messageBox).start();
+			receivers[i] = new Receiver(messageBox);
+			receivers[i].start();
 		}
 
 	}
