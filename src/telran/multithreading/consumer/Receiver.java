@@ -5,8 +5,20 @@ import telran.multithreading.messaging.MessageBox;
 public class Receiver extends Thread {
 	private MessageBox messageBox;
 
+
 	public Receiver(MessageBox messageBox) {
 		setDaemon(true); //FIXME
+		this.messageBox = messageBox;
+
+	}
+	public Receiver() {
+		this(null);
+	}
+	
+	public MessageBox getMessageBox() {
+		return messageBox;
+	}
+	public void setMessageBox(MessageBox messageBox) {
 		this.messageBox = messageBox;
 	}
 	@Override
