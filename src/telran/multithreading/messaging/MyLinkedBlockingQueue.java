@@ -1,9 +1,16 @@
 package telran.multithreading.messaging;
 
 import java.util.concurrent.TimeUnit;
+import java.util.LinkedList;
+import java.util.concurrent.locks.*;
 
 public class MyLinkedBlockingQueue<E> implements MyBlockingQueue<E> {
 	int limit;
+	
+	private LinkedList<E> queue = new LinkedList<>();
+	private Lock monitor = new ReentrantLock();
+	private Condition conditionForProducer = monitor.newCondition();
+	private Condition conditionForConsumer = monitor.newCondition();
 	
 
 	public MyLinkedBlockingQueue(int limit) {
@@ -13,64 +20,148 @@ public class MyLinkedBlockingQueue<E> implements MyBlockingQueue<E> {
 
 	@Override
 	public boolean add(E e) {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			monitor.lock();
+			if(queue.size() == limit) {
+				throw new IllegalStateException();
+			}
+			boolean res = queue.add(e);
+			conditionForConsumer.signal();
+			return res;
+		} finally {
+			monitor.unlock();
+		}
 	}
 
 	@Override
 	public boolean offer(E e) {
-		// TODO Auto-generated method stub
-		return false;
+		boolean res = false;
+		try {
+			monitor.lock();
+			if(queue.size() < limit) {
+				res = queue.add(e);
+				conditionForConsumer.signal();
+			}	
+			return res;
+		} finally {
+			monitor.unlock();
+		}		
 	}
 
 	@Override
-	public void put(E e) {
-		// TODO Auto-generated method stub
-		
+	public void put(E e) throws InterruptedException {
+		try {
+			monitor.lock();
+			while(queue.size() == limit) {				
+					conditionForProducer.await();
+			}
+			queue.add(e);
+			conditionForConsumer.signal();			
+		} finally {
+			monitor.unlock();
+		}		
 	}
 
 	@Override
 	public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			monitor.lock();
+			while(queue.size() == limit) {	
+				if(!conditionForProducer.await(timeout, unit)) {
+					return false;
+			} 
+				}
+				queue.add(e);
+				conditionForConsumer.signal();
+				return true;
+					
+		} finally {
+			monitor.unlock();
+		}
 	}
 
 	@Override
 	public E take() throws InterruptedException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			monitor.lock();
+			while( queue.isEmpty()) {
+				conditionForConsumer.await();
+			}
+			E res = queue.remove(0);
+			conditionForProducer.signal();
+			return res;
+		} finally {
+			monitor.unlock();
+		}		
 	}
 
 	@Override
 	public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			monitor.lock();
+			while(queue.isEmpty()) {
+				if(!conditionForConsumer.await(timeout, unit)) {
+					return null;
+				}
+			}
+			E res = queue.remove();
+			return res;
+		} finally {
+			monitor.unlock();
+		}
+		
 	}
 
 	@Override
 	public E remove() {
-		// TODO Auto-generated method stub
-		return null;
+		try { 
+			monitor.lock();
+			E res = queue.remove();
+			conditionForProducer.signal();;
+			return res;
+
+		} finally {
+			monitor.unlock();
+		}		
 	}
 
 	@Override
 	public E peek() {
-		// TODO Auto-generated method stub
-		return null;
+		E res = null;
+		try {
+			monitor.lock();
+			if(queue.size() != 0) {
+				res = queue.get(0);
+			}
+			return res;
+		} finally {
+			monitor.unlock();
+		}
 	}
 
 	@Override
 	public E element() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			monitor.lock();
+			return queue.element();
+		} finally {
+			monitor.unlock();
+		}		
 	}
 
 	@Override
 	public E poll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
+		E res = null;
+		try {
+			monitor.lock();
+			res = queue.poll();
+			if(res != null) {
+				conditionForProducer.signal();
+			}
+			return res;			
+		} finally {
+			monitor.unlock();
+		}		
+	}	
 
 }
